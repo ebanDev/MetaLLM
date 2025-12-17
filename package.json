@@ -1,0 +1,20 @@
+{
+  "name": "llmratelimiter",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "nuxt preview",
+    "test:chat-stream": "node scripts/test-chat-stream.js"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.2.0",
+    "better-sqlite3": "^9.0.0",
+    "nuxt": "^4.1.0"
+  },
+  "devDependencies": {
+    "@iconify-json/ph": "^1.2.2",
+    "typescript": "^5"
+  }
+}
