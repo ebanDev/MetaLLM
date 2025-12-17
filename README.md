@@ -9,7 +9,7 @@ Tiny, transparent OpenAI-style completions proxy that:
 ## Stack
 - Nuxt 4 + Nuxt UI v4
 - h3 / Nitro server routes
-- SQLite via `better-sqlite3` (hot WAL + large cache)
+- SQLite via `bun:sqlite` (hot WAL + large cache)
 
 ## Quickstart
 ```bash

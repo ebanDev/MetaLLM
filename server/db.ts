@@ -1,21 +1,25 @@
-import Database from "better-sqlite3";
+import { Database } from "bun:sqlite";
 import { mkdirSync } from "fs";
 
 mkdirSync("data", { recursive: true });
 
-export const db = new Database("data/rate_limits.db");
+export const db = new Database("data/rate_limits.db", {
+  create: true,
+  readwrite: true,
+  strict: true,
+});
 
 let schemaReady = false;
 
 export const ensureSchema = () => {
   if (schemaReady) return;
-  db.pragma("journal_mode = WAL");
-  db.pragma("synchronous = NORMAL");
-  db.pragma("foreign_keys = ON");
-  db.pragma("temp_store = MEMORY");
-  db.pragma("cache_size = -64000");
+  db.run("PRAGMA journal_mode = WAL;");
+  db.run("PRAGMA synchronous = NORMAL;");
+  db.run("PRAGMA foreign_keys = ON;");
+  db.run("PRAGMA temp_store = MEMORY;");
+  db.run("PRAGMA cache_size = -64000;");
 
-  db.exec(`
+  db.run(`
     CREATE TABLE IF NOT EXISTS providers (
       id TEXT PRIMARY KEY,
       display_name TEXT,
@@ -83,28 +87,28 @@ export const ensureSchema = () => {
 
   // migrations
   try {
-    db.exec(`ALTER TABLE rate_limits ADD COLUMN per_month INTEGER`);
+    db.run(`ALTER TABLE rate_limits ADD COLUMN per_month INTEGER`);
   } catch {}
   try {
-    db.exec(`ALTER TABLE rate_limits ADD COLUMN tokens_per_minute INTEGER`);
+    db.run(`ALTER TABLE rate_limits ADD COLUMN tokens_per_minute INTEGER`);
   } catch {}
   try {
-    db.exec(`ALTER TABLE rate_limits ADD COLUMN tokens_per_hour INTEGER`);
+    db.run(`ALTER TABLE rate_limits ADD COLUMN tokens_per_hour INTEGER`);
   } catch {}
   try {
-    db.exec(`ALTER TABLE rate_limits ADD COLUMN tokens_per_day INTEGER`);
+    db.run(`ALTER TABLE rate_limits ADD COLUMN tokens_per_day INTEGER`);
   } catch {}
   try {
-    db.exec(`ALTER TABLE rate_limits ADD COLUMN tokens_per_month INTEGER`);
+    db.run(`ALTER TABLE rate_limits ADD COLUMN tokens_per_month INTEGER`);
   } catch {}
   try {
-    db.exec(`ALTER TABLE request_log ADD COLUMN kind TEXT DEFAULT 'completion'`);
+    db.run(`ALTER TABLE request_log ADD COLUMN kind TEXT DEFAULT 'completion'`);
   } catch {}
   try {
-    db.exec(`ALTER TABLE models ADD COLUMN supports_images INTEGER DEFAULT 0`);
+    db.run(`ALTER TABLE models ADD COLUMN supports_images INTEGER DEFAULT 0`);
   } catch {}
   try {
-    db.exec(`CREATE TABLE IF NOT EXISTS search_providers (
+    db.run(`CREATE TABLE IF NOT EXISTS search_providers (
       id TEXT PRIMARY KEY,
       display_name TEXT,
       base_url TEXT NOT NULL,
@@ -118,7 +122,7 @@ export const ensureSchema = () => {
     )`);
   } catch {}
   try {
-    db.exec(`CREATE TABLE IF NOT EXISTS search_request_log (
+    db.run(`CREATE TABLE IF NOT EXISTS search_request_log (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       provider_id TEXT NOT NULL REFERENCES search_providers(id) ON DELETE CASCADE,
       ts INTEGER NOT NULL
